@@ -15,4 +15,8 @@
     <Folder Include="Controllers\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\TopUpManager.DataAccess\TopUpManager.DataAccess.csproj" />
+  </ItemGroup>
+
 </Project>

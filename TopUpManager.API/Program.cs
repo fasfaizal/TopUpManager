@@ -1,3 +1,4 @@
+using TopUpManager.API.ExceptionHandler;
 using TopUpManager.Common.Interfaces.DataAccess;
 using TopUpManager.Common.Interfaces.Services;
 using TopUpManager.DataAccess.Extensions;
@@ -19,13 +20,16 @@ namespace TopUpManager.API
             //Add logging
             builder.Services.AddLogging(configure => configure.AddConsole());
 
-            builder.Services.AddControllers();
-            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-            builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            // Add global exception handler
+            builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+            builder.Services.AddProblemDetails();
 
             //Add Db Context
             builder.Services.AddDBService(builder.Configuration.GetConnectionString("DbConnectionString"));
+
+            builder.Services.AddControllers();
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
@@ -40,6 +44,7 @@ namespace TopUpManager.API
 
             app.UseAuthorization();
 
+            app.UseExceptionHandler();
 
             app.MapControllers();
 

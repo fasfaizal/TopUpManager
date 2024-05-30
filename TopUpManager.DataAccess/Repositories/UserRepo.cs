@@ -13,6 +13,12 @@ namespace TopUpManager.DataAccess.Repositories
             _dbContext = dbContext;
         }
 
+        /// <summary>
+        /// Adds a new user to the database asynchronously.
+        /// </summary>
+        /// <param name="user">
+        /// The user object to add to the database.
+        /// </param>
         public async Task AddUserAsync(User user)
         {
             await _dbContext.Users.AddAsync(user);

@@ -33,10 +33,8 @@ namespace TopUpManager.Services.Tests.Services
         [Fact]
         public async Task CreateUserAsync_WithNullUserRequestModel_ShouldThrowArgumentNullException()
         {
-            // Arrange
             UserRequestModel userModel = null;
 
-            // Act & Assert
             await Assert.ThrowsAsync<ArgumentNullException>(() => _userService.CreateUserAsync(userModel));
         }
     }

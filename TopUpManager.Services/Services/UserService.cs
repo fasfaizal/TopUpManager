@@ -14,6 +14,15 @@ namespace TopUpManager.Services.Services
             _userRepo = userRepo;
         }
 
+        /// <summary>
+        /// Creates a new user asynchronously based on the provided user request model.
+        /// </summary>
+        /// <param name="userModel">
+        /// The user request model containing the details of the user to be created.
+        /// </param>
+        /// <returns>
+        /// Newly created user.
+        /// </returns>
         public async Task<User> CreateUserAsync(UserRequestModel userModel)
         {
             if (userModel is null)

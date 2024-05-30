@@ -16,6 +16,8 @@ namespace TopUpManager.API
             // Add services to the container.
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IUserRepo, UserRepo>();
+            builder.Services.AddScoped<IBeneficiaryService, BeneficiaryService>();
+            builder.Services.AddScoped<IBeneficiaryRepo, BeneficiaryRepo>();
 
             //Add logging
             builder.Services.AddLogging(configure => configure.AddConsole());

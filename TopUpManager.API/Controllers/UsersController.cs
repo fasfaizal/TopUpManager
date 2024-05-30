@@ -15,6 +15,15 @@ namespace TopUpManager.API.Controllers
             _userService = userService;
         }
 
+        /// <summary>
+        /// Creates a new user based on the provided user request model asynchronously.
+        /// </summary>
+        /// <param name="userModel">
+        /// The user request model containing the details of the user to be created.
+        /// </param>
+        /// <returns>
+        /// Returns the newly created user.
+        /// </returns>
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] UserRequestModel userModel)
         {

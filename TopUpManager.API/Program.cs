@@ -16,6 +16,9 @@ namespace TopUpManager.API
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IUserRepo, UserRepo>();
 
+            //Add logging
+            builder.Services.AddLogging(configure => configure.AddConsole());
+
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();

@@ -1,4 +1,8 @@
+using TopUpManager.Common.Interfaces.DataAccess;
+using TopUpManager.Common.Interfaces.Services;
 using TopUpManager.DataAccess.Extensions;
+using TopUpManager.DataAccess.Repositories;
+using TopUpManager.Services.Services;
 
 namespace TopUpManager.API
 {
@@ -9,6 +13,8 @@ namespace TopUpManager.API
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IUserRepo, UserRepo>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

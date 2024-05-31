@@ -19,6 +19,7 @@ namespace TopUpManager.API
             builder.Services.AddScoped<IUserRepo, UserRepo>();
             builder.Services.AddScoped<IBeneficiaryService, BeneficiaryService>();
             builder.Services.AddScoped<IBeneficiaryRepo, BeneficiaryRepo>();
+            builder.Services.AddScoped<ITopUpTransactionService, TopUpTransactionService>();
 
             //Add logging
             builder.Services.AddLogging(configure => configure.AddConsole());

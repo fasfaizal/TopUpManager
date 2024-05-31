@@ -1,4 +1,5 @@
 using TopUpManager.API.ExceptionHandler;
+using TopUpManager.Common.Configs;
 using TopUpManager.Common.Interfaces.DataAccess;
 using TopUpManager.Common.Interfaces.Services;
 using TopUpManager.DataAccess.Extensions;
@@ -28,6 +29,9 @@ namespace TopUpManager.API
 
             //Add Db Context
             builder.Services.AddDBService(builder.Configuration.GetConnectionString("DbConnectionString"));
+
+            //Add configurations
+            builder.Services.Configure<Configurations>(builder.Configuration.GetSection("Configurations"));
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();

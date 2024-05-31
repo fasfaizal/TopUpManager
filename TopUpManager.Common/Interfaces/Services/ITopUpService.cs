@@ -1,6 +1,6 @@
 ﻿namespace TopUpManager.Common.Interfaces.Services
 {
-    public interface ITopUpTransactionService
+    public interface ITopUpService
     {
         List<int> GetOptions();
     }

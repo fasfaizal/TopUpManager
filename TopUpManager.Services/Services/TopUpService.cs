@@ -4,11 +4,11 @@ using TopUpManager.Common.Interfaces.Services;
 
 namespace TopUpManager.Services.Services
 {
-    public class TopUpTransactionService : ITopUpTransactionService
+    public class TopUpService : ITopUpService
     {
         private readonly Configurations _configurations;
 
-        public TopUpTransactionService(IOptions<Configurations> config)
+        public TopUpService(IOptions<Configurations> config)
         {
             _configurations = config.Value;
         }

@@ -5,11 +5,11 @@ namespace TopUpManager.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TopUpTransactionsController : ControllerBase
+    public class TopUpController : ControllerBase
     {
-        private readonly ITopUpTransactionService _topUpTransactionService;
+        private readonly ITopUpService _topUpTransactionService;
 
-        public TopUpTransactionsController(ITopUpTransactionService topUpTransactionService)
+        public TopUpController(ITopUpService topUpTransactionService)
         {
             _topUpTransactionService = topUpTransactionService;
         }

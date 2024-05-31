@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using System.Net;
 using TopUpManager.Common.Configs;
@@ -16,17 +17,19 @@ namespace TopUpManager.Services.Tests.Services
         private readonly BeneficiaryService _beneficiaryService;
         private readonly Mock<IOptions<Configurations>> _configMock;
         private readonly Mock<IUserRepo> _mockUserRepo;
+        private readonly Mock<ILogger<BeneficiaryService>> _mockLogger;
 
         public BeneficiaryServiceTests()
         {
             _mockBeneficiaryRepo = new Mock<IBeneficiaryRepo>();
             _mockUserRepo = new Mock<IUserRepo>();
             _configMock = new Mock<IOptions<Configurations>>();
+            _mockLogger = new Mock<ILogger<BeneficiaryService>>();
             _configMock.Setup(c => c.Value).Returns(new Configurations
             {
                 MaxBeneficiaryCount = 1,
             });
-            _beneficiaryService = new BeneficiaryService(_mockBeneficiaryRepo.Object, _mockUserRepo.Object, _configMock.Object);
+            _beneficiaryService = new BeneficiaryService(_mockBeneficiaryRepo.Object, _mockUserRepo.Object, _configMock.Object, _mockLogger.Object);
         }
 
         [Fact]

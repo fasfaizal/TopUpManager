@@ -8,6 +8,6 @@ namespace TopUpManager.Common.Entity
         [MaxLength(20)]
         public string Nickname { get; set; }
         public int UserId { get; set; }
-        public User User { get; set; }
+        public ICollection<TopUpTransaction> TopUpTransactions { get; set; }
     }
 }

@@ -27,11 +27,6 @@ namespace TopUpManager.API.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] UserRequestModel userModel)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var user = await _userService.CreateUserAsync(userModel);
             return Ok(user);
         }

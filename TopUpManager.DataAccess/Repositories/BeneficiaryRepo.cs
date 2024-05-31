@@ -27,5 +27,11 @@ namespace TopUpManager.DataAccess.Repositories
         {
             return await _dbContext.Beneficiaries.Where(beneficiary => beneficiary.UserId == userId).ToListAsync();
         }
+
+        public async Task AddBeneficiaryAsync(Beneficiary beneficiary)
+        {
+            await _dbContext.Beneficiaries.AddAsync(beneficiary);
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }

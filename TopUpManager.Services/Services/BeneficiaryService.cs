@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System.Net;
 using TopUpManager.Common.Configs;
 using TopUpManager.Common.Entity;
@@ -14,12 +15,14 @@ namespace TopUpManager.Services.Services
         private readonly IBeneficiaryRepo _beneficiaryRepo;
         private readonly IUserRepo _userRepo;
         private readonly Configurations _configurations;
+        private readonly ILogger _logger;
 
-        public BeneficiaryService(IBeneficiaryRepo beneficiaryRepo, IUserRepo userRepo, IOptions<Configurations> config)
+        public BeneficiaryService(IBeneficiaryRepo beneficiaryRepo, IUserRepo userRepo, IOptions<Configurations> config, ILogger<BeneficiaryService> logger)
         {
             _beneficiaryRepo = beneficiaryRepo;
             _userRepo = userRepo;
             _configurations = config.Value;
+            _logger = logger;
         }
 
         /// <summary>
@@ -58,12 +61,14 @@ namespace TopUpManager.Services.Services
             var user = await _userRepo.GetUserByIdAsync(beneficiaryRequest.UserId);
             if (user == null)
             {
+                _logger.LogWarning($"User does not exists: {beneficiaryRequest.UserId}");
                 throw new ApiException(HttpStatusCode.BadRequest, "Invalid user");
             }
 
             // Check if beneficiary count is greater than MaxBeneficiaryCount
             if (user.Beneficiaries.Count >= _configurations.MaxBeneficiaryCount)
             {
+                _logger.LogWarning($"Beneficiaries limit reached for user id: {beneficiaryRequest.UserId}");
                 throw new ApiException(HttpStatusCode.UnprocessableEntity, "Beneficiary limit reached");
             }
 

@@ -28,6 +28,10 @@ namespace TopUpManager.DataAccess.Repositories
             return await _dbContext.Beneficiaries.Where(beneficiary => beneficiary.UserId == userId).ToListAsync();
         }
 
+        /// <summary>
+        /// Adds a beneficiary asynchronously to the database.
+        /// </summary>
+        /// <param name="beneficiary">The <see cref="Beneficiary"/> object representing the beneficiary to be added.</param>
         public async Task AddBeneficiaryAsync(Beneficiary beneficiary)
         {
             await _dbContext.Beneficiaries.AddAsync(beneficiary);

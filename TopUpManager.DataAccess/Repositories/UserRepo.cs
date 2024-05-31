@@ -34,9 +34,29 @@ namespace TopUpManager.DataAccess.Repositories
         /// An object representing the user with the specified ID, including their beneficiaries, 
         /// or null if no user with the specified ID is found.
         /// </returns>
-        public async Task<User> GetUserByIdAsync(int userId)
+        public async Task<User?> GetUserByIdAsync(int userId)
         {
-            return await _dbContext.Users.Where(user => user.Id == userId).Include(user => user.Beneficiaries).FirstOrDefaultAsync();
+            return await _dbContext.Users
+                .Where(user => user.Id == userId)
+                .Include(user => user.Beneficiaries)
+                .FirstOrDefaultAsync();
+        }
+
+        /// <summary>
+        /// Retrieves a user with their transactions asynchronously.
+        /// </summary>
+        /// <param name="id">The unique identifier of the user.</param>
+        /// <param name="startDate">The start date from which to include the user's transactions.</param>
+        /// <returns>
+        /// Returns a User object with transactions, or null if no user is found.
+        /// </returns>
+        public async Task<User?> GetUserWithTransactionsAsync(int id, DateTime startDate)
+        {
+            return await _dbContext.Users
+                .Where(user => user.Id == id)
+                .Include(user => user.Beneficiaries)
+                .ThenInclude(beneficiary => beneficiary.TopUpTransactions.Where(o => o.Date >= startDate))
+                .FirstOrDefaultAsync();
         }
     }
 }

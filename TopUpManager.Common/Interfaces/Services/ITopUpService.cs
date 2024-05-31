@@ -1,7 +1,10 @@
-﻿namespace TopUpManager.Common.Interfaces.Services
+﻿using TopUpManager.Common.Models.Request;
+
+namespace TopUpManager.Common.Interfaces.Services
 {
     public interface ITopUpService
     {
-        List<int> GetOptions();
+        List<decimal> GetOptions();
+        Task TopUpAsync(TopUpRequestModel topUpRequest);
     }
 }

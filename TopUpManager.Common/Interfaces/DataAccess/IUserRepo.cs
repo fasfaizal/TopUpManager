@@ -5,6 +5,7 @@ namespace TopUpManager.Common.Interfaces.DataAccess
     public interface IUserRepo
     {
         Task AddUserAsync(User user);
-        Task<User> GetUserByIdAsync(int id);
+        Task<User?> GetUserByIdAsync(int id);
+        Task<User?> GetUserWithTransactionsAsync(int id, DateTime startDate);
     }
 }

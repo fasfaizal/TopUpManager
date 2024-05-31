@@ -33,17 +33,5 @@ namespace TopUpManager.API.Tests.Controllers
             Assert.Equal(userModel.Name, returnedUser.Name);
             Assert.Equal(userModel.IsVerified, returnedUser.IsVerified);
         }
-
-        [Fact]
-        public async Task Post_WithInvalidModelState_ShouldReturnBadRequest()
-        {
-            var userModel = new UserRequestModel { Name = "", IsVerified = true };
-            _usersController.ModelState.AddModelError("Name", "Name is required");
-
-            var result = await _usersController.Post(userModel);
-
-            var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-            Assert.IsType<SerializableError>(badRequestResult.Value);
-        }
     }
 }

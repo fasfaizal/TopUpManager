@@ -76,7 +76,8 @@ namespace TopUpManager.Services.Services
             var newBeneficiary = new Beneficiary
             {
                 Nickname = beneficiaryRequest.Nickname,
-                UserId = beneficiaryRequest.UserId
+                UserId = beneficiaryRequest.UserId,
+                PhoneNumber = beneficiaryRequest.PhoneNumber
             };
             await _beneficiaryRepo.AddBeneficiaryAsync(newBeneficiary);
             return newBeneficiary;

@@ -12,7 +12,7 @@ using TopUpManager.DataAccess.DBContext;
 namespace TopUpManager.DataAccess.Migrations
 {
     [DbContext(typeof(TopUpManagerDbContext))]
-    [Migration("20240529160219_Initial")]
+    [Migration("20240601060358_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -34,6 +34,11 @@ namespace TopUpManager.DataAccess.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Nickname")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
@@ -94,24 +99,30 @@ namespace TopUpManager.DataAccess.Migrations
 
             modelBuilder.Entity("TopUpManager.Common.Entity.Beneficiary", b =>
                 {
-                    b.HasOne("TopUpManager.Common.Entity.User", "User")
-                        .WithMany()
+                    b.HasOne("TopUpManager.Common.Entity.User", null)
+                        .WithMany("Beneficiaries")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TopUpManager.Common.Entity.TopUpTransaction", b =>
                 {
-                    b.HasOne("TopUpManager.Common.Entity.Beneficiary", "Beneficiary")
-                        .WithMany()
+                    b.HasOne("TopUpManager.Common.Entity.Beneficiary", null)
+                        .WithMany("TopUpTransactions")
                         .HasForeignKey("BeneficiaryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
 
-                    b.Navigation("Beneficiary");
+            modelBuilder.Entity("TopUpManager.Common.Entity.Beneficiary", b =>
+                {
+                    b.Navigation("TopUpTransactions");
+                });
+
+            modelBuilder.Entity("TopUpManager.Common.Entity.User", b =>
+                {
+                    b.Navigation("Beneficiaries");
                 });
 #pragma warning restore 612, 618
         }

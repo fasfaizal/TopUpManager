@@ -4,5 +4,6 @@
     {
         decimal GetBalance(int userId);
         void Debit(int userId, decimal amount);
+        void Credit(int userId, decimal amount);
     }
 }

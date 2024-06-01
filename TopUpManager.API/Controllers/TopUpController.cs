@@ -53,7 +53,7 @@ namespace TopUpManager.API.Controllers
             }
             catch (ApiException ex)
             {
-                _logger.LogError(ex, ex.Message);
+                _logger.LogWarning(ex, ex.Message);
                 return StatusCode((int)ex.StatusCode, ex.Message);
             }
         }

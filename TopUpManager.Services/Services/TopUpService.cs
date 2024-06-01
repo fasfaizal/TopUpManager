@@ -53,43 +53,93 @@ namespace TopUpManager.Services.Services
                 throw new ArgumentNullException(nameof(topUpRequest));
             }
 
-            // Check if top-up amount is valid.
-            if (!(_configurations.TopUpOptions.Contains(topUpRequest.Amount)))
-            {
-                _logger.LogWarning($"Invalid amount {topUpRequest.Amount}, userId: {topUpRequest.UserId}");
-                throw new ApiException(HttpStatusCode.BadRequest, "Invalid amount");
-            }
-
-            // Get the fist day of current calendar month.
-            DateTime firstDayOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            ValidateTopUpAmount(topUpRequest.UserId, topUpRequest.Amount);
 
             // Get user with all transactions of current month.
+            DateTime firstDayOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
             var user = await _userRepo.GetUserWithTransactionsAsync(topUpRequest.UserId, firstDayOfMonth);
 
+            CheckIfUserExists(topUpRequest.UserId, user);
+            ValidateBeneficiaryForUser(topUpRequest.BeneficiaryId, user);
+            ValidateMonthlyLimitForUser(user, topUpRequest.Amount);
+            ValidateMonthlyLimitForBeneficiary(user, topUpRequest);
+
+            // Get account balance from external service
+            decimal balance = _externalFinancialService.GetBalance(topUpRequest.UserId);
+            decimal totalTransactionAmount = topUpRequest.Amount + _configurations.TransactionCharge;
+            ValidateBalanceForUser(user.Id, balance, totalTransactionAmount);
+
+            // Debit balance using external service
+            _externalFinancialService.Debit(topUpRequest.UserId, totalTransactionAmount);
+
+            // Do the top up transaction to credit balance to beneficiary phone
+            string beneficiaryPhone = user.Beneficiaries.First(ben => ben.Id == topUpRequest.BeneficiaryId).PhoneNumber;
+            bool isTransactionSuccess = DoTopUp(beneficiaryPhone, topUpRequest.Amount);
+            if (!isTransactionSuccess)
+            {
+                // If transaction fail credit money back
+                _externalFinancialService.Credit(topUpRequest.UserId, totalTransactionAmount);
+                throw new ApiException(HttpStatusCode.UnprocessableEntity, "Top up transaction failed");
+            }
+
+            // Add a new top up transaction for beneficiary
+            var topUpTransaction = new TopUpTransaction
+            {
+                BeneficiaryId = topUpRequest.BeneficiaryId,
+                Amount = topUpRequest.Amount,
+                Date = DateTime.Now
+            };
+            await _topUpTransactionRepo.AddTransactionAsync(topUpTransaction);
+            _logger.LogInformation($"Top up transaction successful for user id: {topUpRequest.UserId}, beneficiary id: {topUpRequest.BeneficiaryId}, amount: {topUpRequest.Amount}");
+        }
+
+        #region PrivateFunctions
+
+        private void ValidateTopUpAmount(int userId, decimal amount)
+        {
+            // Check if top-up amount is valid.
+            if (!(_configurations.TopUpOptions.Contains(amount)))
+            {
+                _logger.LogWarning($"Invalid amount {amount}, userId: {userId}");
+                throw new ApiException(HttpStatusCode.BadRequest, "Invalid amount");
+            }
+        }
+
+        private void CheckIfUserExists(int userId, User user)
+        {
             // Check if user exists.
             if (user == null)
             {
-                _logger.LogWarning($"Invalid user, userId: {topUpRequest.UserId}");
+                _logger.LogWarning($"Invalid user, userId: {userId}");
                 throw new ApiException(HttpStatusCode.BadRequest, "Invalid user");
             }
+        }
 
+        private void ValidateBeneficiaryForUser(int beneficiaryId, User user)
+        {
             // Check if beneficiary exists for user.
-            if (user.Beneficiaries == null || !(user.Beneficiaries.Any(beneficiary => beneficiary.Id == topUpRequest.BeneficiaryId)))
+            if (user.Beneficiaries == null || !(user.Beneficiaries.Any(beneficiary => beneficiary.Id == beneficiaryId)))
             {
-                _logger.LogWarning($"Beneficiary: {topUpRequest.BeneficiaryId} does not exist for user, userId: {topUpRequest.UserId}");
+                _logger.LogWarning($"Beneficiary: {beneficiaryId} does not exist for user, userId: {user.Id}");
                 throw new ApiException(HttpStatusCode.BadRequest, "Invalid beneficiary");
             }
+        }
 
+        private void ValidateMonthlyLimitForUser(User user, decimal amount)
+        {
             // Check monthly limit for user
             var monthlyUserTransactionAmount = user.Beneficiaries
                                                .SelectMany(ben => ben.TopUpTransactions)
                                                .Sum(trans => trans.Amount);
-            if ((topUpRequest.Amount + monthlyUserTransactionAmount) > _configurations.MonthlyLimitForUser)
+            if ((amount + monthlyUserTransactionAmount) > _configurations.MonthlyLimitForUser)
             {
-                _logger.LogWarning($"Monthly limit exceeded for user, userId: {topUpRequest.UserId}");
+                _logger.LogWarning($"Monthly limit exceeded for user, userId: {user.Id}");
                 throw new ApiException(HttpStatusCode.UnprocessableEntity, "Limit exceeded for user");
             }
+        }
 
+        private void ValidateMonthlyLimitForBeneficiary(User user, TopUpRequestModel topUpRequest)
+        {
             // Check monthly limit for beneficiary
             var monthlyBeneficiaryTransactionAmount = user.Beneficiaries
                                            .Where(ben => ben.Id == topUpRequest.BeneficiaryId)
@@ -102,31 +152,34 @@ namespace TopUpManager.Services.Services
                 _logger.LogWarning($"Monthly limit exceeded for beneficiary, userId: {topUpRequest.UserId}, beneficiary id: {topUpRequest.BeneficiaryId}");
                 throw new ApiException(HttpStatusCode.UnprocessableEntity, "Limit exceeded for beneficiary");
             }
+        }
 
-            // Get account balance from external service
-            _logger.LogInformation($"Getting account balance for user id: {topUpRequest.UserId}");
-            decimal balance = _externalFinancialService.GetBalance(topUpRequest.UserId);
-
+        private void ValidateBalanceForUser(int userId, decimal balance, decimal totalTransactionAmount)
+        {
             // Check if user has balance to do the transaction
-            decimal totalTransactionAmount = topUpRequest.Amount + _configurations.TransactionCharge;
             if (balance < totalTransactionAmount)
             {
-                _logger.LogWarning($"Low balance for user, userId: {topUpRequest.UserId}");
+                _logger.LogWarning($"Low balance for user, userId: {userId}");
                 throw new ApiException(HttpStatusCode.UnprocessableEntity, "No balance");
             }
-
-            // Debit balance using external service
-            _logger.LogInformation($"Debiting amount: {totalTransactionAmount} for userId: {topUpRequest.UserId}");
-            _externalFinancialService.Debit(topUpRequest.UserId, totalTransactionAmount);
-            // Add a new top up transaction for beneficiary
-            var topUpTransaction = new TopUpTransaction
-            {
-                BeneficiaryId = topUpRequest.BeneficiaryId,
-                Amount = topUpRequest.Amount,
-                Date = DateTime.Now
-            };
-            await _topUpTransactionRepo.AddTransactionAsync(topUpTransaction);
-            _logger.LogInformation($"Top up transaction successful for user id: {topUpRequest.UserId}, beneficiary id: {topUpRequest.BeneficiaryId}, amount: {topUpRequest.Amount}");
         }
+
+        private bool DoTopUp(string number, decimal amount)
+        {
+            // Do the real transaction, by calling some external service if needed
+            // And return true if transaction is successful or else return true
+            try
+            {
+                _logger.LogInformation($"Starting topup transaction for {number}, amount {amount}");
+                return true;
+            }
+            catch
+            {
+                _logger.LogError($"Topup transaction failed for {number} for amount {amount}");
+                return false;
+            }
+        }
+
+        #endregion
     }
 }

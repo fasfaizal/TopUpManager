@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TopUpManager.Services.Tests
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TopUpManager.API.Tests", "TopUpManager.API.Tests\TopUpManager.API.Tests.csproj", "{26B7376C-90B6-428E-B4F7-39E901247DF4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceService.API", "FinanceService.API\FinanceService.API.csproj", "{4D71C8D1-7075-402F-977A-09EF01DDA15D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{26B7376C-90B6-428E-B4F7-39E901247DF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{26B7376C-90B6-428E-B4F7-39E901247DF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{26B7376C-90B6-428E-B4F7-39E901247DF4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D71C8D1-7075-402F-977A-09EF01DDA15D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D71C8D1-7075-402F-977A-09EF01DDA15D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D71C8D1-7075-402F-977A-09EF01DDA15D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D71C8D1-7075-402F-977A-09EF01DDA15D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

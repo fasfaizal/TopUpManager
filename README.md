@@ -4,7 +4,7 @@
 
 - `Authorization` can be implemented, and we don't need to send the user's details in every request.
 - `Logging` can be improved by using some external logging services, rather than using console logging.
-- Usage of real services and functions in real world scenario. Currenly a mock implementation is added for `IExternalFinancialService` service and `DoTopUp` function(credit top up to phone).
+- Usage of real services and functions in real world scenario. Currenly a mock implementation is added for `FinanceService` service(external service) and `DoTopUp` function(credit top up to phone).
 - Tools like `AutoMapper` can be used to remove fileds which are not required in the response.
 
 ### Setup
@@ -25,11 +25,13 @@ To run the TopupManager API, ensure you .NET Core SDK(Version 8) installed on yo
         "MonthlyLimitForUser": 3000,
         "VerifiedUserMonthlyBeneficiaryLimit": 500,
         "UnverifiedUserMonthlyBeneficiaryLimit": 1000,
-        "TransactionCharge": 1
+        "TransactionCharge": 1,
+        "FinanceServiceBaseUrl": "http://localhost:5002"
 }
 ```
 
 - Restore the dependencies using `dotnet restore`.
-- Run the application using `dotnet run --project TopUpManager.API --urls=http://localhost:5001/`.
+- Run the Extenal Http Service(debit/credit) by running `dotnet run --project FinanceService.API --urls=http://localhost:5002/` in a new terminal.
+- Run the application using `dotnet run --project TopUpManager.API --urls=http://localhost:5001/`, in another terminal.
 - The app will be available at `http://localhost:5001`.
 - Open `http://localhost:5001/swagger/index.html` to view the swagger API documentation.

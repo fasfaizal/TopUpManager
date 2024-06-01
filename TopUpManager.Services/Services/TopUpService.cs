@@ -74,7 +74,7 @@ namespace TopUpManager.Services.Services
             }
 
             // Check if beneficiary exists for user.
-            if (!(user.Beneficiaries.Any(beneficiary => beneficiary.Id == topUpRequest.BeneficiaryId)))
+            if (user.Beneficiaries == null || !(user.Beneficiaries.Any(beneficiary => beneficiary.Id == topUpRequest.BeneficiaryId)))
             {
                 _logger.LogWarning($"Beneficiary: {topUpRequest.BeneficiaryId} does not exist for user, userId: {topUpRequest.UserId}");
                 throw new ApiException(HttpStatusCode.BadRequest, "Invalid beneficiary");

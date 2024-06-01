@@ -21,7 +21,8 @@ namespace TopUpManager.API
             builder.Services.AddScoped<IBeneficiaryRepo, BeneficiaryRepo>();
             builder.Services.AddScoped<ITopUpService, TopUpService>();
             builder.Services.AddScoped<ITopUpTransactionRepo, TopUpTransactionRepo>();
-            builder.Services.AddScoped<IExternalFinancialService, ExternalFinancialService>();
+            builder.Services.AddScoped<IExternalFinanceService, ExternalFinanceService>();
+            builder.Services.AddHttpClient<ExternalFinanceService>();
 
             //Add logging
             builder.Services.AddLogging(configure => configure.AddConsole());

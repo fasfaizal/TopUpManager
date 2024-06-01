@@ -14,11 +14,11 @@ namespace TopUpManager.Services.Services
     {
         private readonly Configurations _configurations;
         private readonly IUserRepo _userRepo;
-        private readonly IExternalFinancialService _externalFinancialService;
+        private readonly IExternalFinanceService _externalFinancialService;
         private readonly ITopUpTransactionRepo _topUpTransactionRepo;
         private readonly ILogger _logger;
 
-        public TopUpService(IOptions<Configurations> config, IUserRepo userRepo, IExternalFinancialService externalFinancialService, ITopUpTransactionRepo topUpTransactionRepo, ILogger<TopUpService> logger)
+        public TopUpService(IOptions<Configurations> config, IUserRepo userRepo, IExternalFinanceService externalFinancialService, ITopUpTransactionRepo topUpTransactionRepo, ILogger<TopUpService> logger)
         {
             _configurations = config.Value;
             _userRepo = userRepo;
@@ -65,12 +65,12 @@ namespace TopUpManager.Services.Services
             ValidateMonthlyLimitForBeneficiary(user, topUpRequest);
 
             // Get account balance from external service
-            decimal balance = _externalFinancialService.GetBalance(topUpRequest.UserId);
+            decimal balance = await _externalFinancialService.GetBalance(topUpRequest.UserId);
             decimal totalTransactionAmount = topUpRequest.Amount + _configurations.TransactionCharge;
             ValidateBalanceForUser(user.Id, balance, totalTransactionAmount);
 
             // Debit balance using external service
-            _externalFinancialService.Debit(topUpRequest.UserId, totalTransactionAmount);
+            await _externalFinancialService.Debit(topUpRequest.UserId, totalTransactionAmount);
 
             // Do the top up transaction to credit balance to beneficiary phone
             string beneficiaryPhone = user.Beneficiaries.First(ben => ben.Id == topUpRequest.BeneficiaryId).PhoneNumber;
@@ -78,7 +78,7 @@ namespace TopUpManager.Services.Services
             if (!isTransactionSuccess)
             {
                 // If transaction fail credit money back
-                _externalFinancialService.Credit(topUpRequest.UserId, totalTransactionAmount);
+                await _externalFinancialService.Credit(topUpRequest.UserId, totalTransactionAmount);
                 throw new ApiException(HttpStatusCode.UnprocessableEntity, "Top up transaction failed");
             }
 

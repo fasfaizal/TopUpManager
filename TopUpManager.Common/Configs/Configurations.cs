@@ -8,5 +8,6 @@
         public decimal VerifiedUserMonthlyBeneficiaryLimit { get; set; }
         public decimal UnverifiedUserMonthlyBeneficiaryLimit { get; set; }
         public decimal TransactionCharge { get; set; }
+        public string FinanceServiceBaseUrl { get; set; }
     }
 }

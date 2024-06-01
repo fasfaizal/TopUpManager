@@ -16,7 +16,7 @@ namespace TopUpManager.Services.Tests.Services
     {
         private readonly Mock<IOptions<Configurations>> _mockConfig;
         private readonly Mock<IUserRepo> _mockUserRepo;
-        private readonly Mock<IExternalFinancialService> _mockExternalFinancialService;
+        private readonly Mock<IExternalFinanceService> _mockExternalFinancialService;
         private readonly Mock<ITopUpTransactionRepo> _mockTopUpTransactionRepo;
         private readonly Mock<ILogger<TopUpService>> _mockLogger;
         private readonly TopUpService _topUpService;
@@ -25,7 +25,7 @@ namespace TopUpManager.Services.Tests.Services
         {
             _mockConfig = new Mock<IOptions<Configurations>>();
             _mockUserRepo = new Mock<IUserRepo>();
-            _mockExternalFinancialService = new Mock<IExternalFinancialService>();
+            _mockExternalFinancialService = new Mock<IExternalFinanceService>();
             _mockTopUpTransactionRepo = new Mock<ITopUpTransactionRepo>();
             _mockLogger = new Mock<ILogger<TopUpService>>();
 
@@ -120,7 +120,7 @@ namespace TopUpManager.Services.Tests.Services
             var user = new User { Id = 1, Beneficiaries = new List<Beneficiary> { beneficiary } };
             var topUpRequest = new TopUpRequestModel { Amount = 10, UserId = 1, BeneficiaryId = 1 };
             _mockUserRepo.Setup(repo => repo.GetUserWithTransactionsAsync(topUpRequest.UserId, It.IsAny<DateTime>())).ReturnsAsync(user);
-            _mockExternalFinancialService.Setup(service => service.GetBalance(topUpRequest.UserId)).Returns(5);
+            _mockExternalFinancialService.Setup(service => service.GetBalance(topUpRequest.UserId)).ReturnsAsync(5);
 
             var exception = await Assert.ThrowsAsync<ApiException>(() => _topUpService.TopUpAsync(topUpRequest));
             Assert.Equal(HttpStatusCode.UnprocessableEntity, exception.StatusCode);
@@ -134,7 +134,7 @@ namespace TopUpManager.Services.Tests.Services
             var user = new User { Id = 1, Beneficiaries = new List<Beneficiary> { beneficiary } };
             var topUpRequest = new TopUpRequestModel { Amount = 10, UserId = 1, BeneficiaryId = 1 };
             _mockUserRepo.Setup(repo => repo.GetUserWithTransactionsAsync(topUpRequest.UserId, It.IsAny<DateTime>())).ReturnsAsync(user);
-            _mockExternalFinancialService.Setup(service => service.GetBalance(topUpRequest.UserId)).Returns(100);
+            _mockExternalFinancialService.Setup(service => service.GetBalance(topUpRequest.UserId)).ReturnsAsync(100);
             _mockExternalFinancialService.Setup(service => service.Debit(topUpRequest.UserId, 11)).Verifiable();
             _mockTopUpTransactionRepo.Setup(repo => repo.AddTransactionAsync(It.IsAny<TopUpTransaction>())).Returns(Task.CompletedTask).Verifiable();
 

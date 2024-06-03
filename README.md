@@ -31,6 +31,7 @@ To run the TopupManager API, ensure you .NET Core SDK(Version 8) installed on yo
 ```
 
 - Restore the dependencies using `dotnet restore`.
+- Run the ef migrations by running the command `dotnet ef database update --startup-project TopUpManager.API --project TopUpManager.DataAccess`.
 - Run the Extenal Http Service(debit/credit) by running `dotnet run --project FinanceService.API --urls=http://localhost:5002/` in a new terminal.
 - Run the application using `dotnet run --project TopUpManager.API --urls=http://localhost:5001/`, in another terminal.
 - The app will be available at `http://localhost:5001`.
